@@ -13,8 +13,16 @@ functions:
     handler: main
     environment:
       MONGO_HOST: ${opt:hostname}
+      MONGO_USER: monngodb
+      MONGO_PASS: ${opt:password}
       USER_DATABASE: mongodb
       HATEAOS: user
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
+    vpc:
+      securityGroupIds:
+        - "sg-056ee613e30cfa5b5"
+      subnetIds:
+        - "subnet-0af41f8e0404d7b23"
+        - "subnet-0c2515119bdf77d4c"
