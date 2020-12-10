@@ -1,0 +1,20 @@
+service: user
+provider:
+  name: aws
+  runtime: go1.x
+  timeout: 60
+package:
+  exclude:
+    - ./**
+  include:
+    - ./main
+functions:
+  user:
+    handler: main
+    environment:
+      MONGO_HOST: ${opt:hostname}
+      USER_DATABASE: mongodb
+      HATEAOS: user
+    events:
+      - http: ANY /
+      - http: 'ANY {proxy+}'

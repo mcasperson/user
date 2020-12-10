@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/awslabs/aws-lambda-go-api-proxy/httpadapter"
 	"net"
 	"net/http"
 	"os"
@@ -150,18 +154,25 @@ func main() {
 	// Handler
 	handler := commonMiddleware.Merge(httpMiddleware...).Wrap(router)
 
-	// Create and launch the HTTP server.
-	go func() {
-		logger.Log("transport", "HTTP", "port", port)
-		errc <- http.ListenAndServe(fmt.Sprintf(":%v", port), handler)
-	}()
+	if os.Getenv("LAMBDA_TASK_ROOT") != "" {
+		adapter := httpadapter.New(handler)
+		lambda.Start(func(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+			return adapter.ProxyWithContext(ctx, req)
+		})
+	} else {
+		// Create and launch the HTTP server.
+		go func() {
+			logger.Log("transport", "HTTP", "port", port)
+			errc <- http.ListenAndServe(fmt.Sprintf(":%v", port), handler)
+		}()
 
-	// Capture interrupts.
-	go func() {
-		c := make(chan os.Signal)
-		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
-		errc <- fmt.Errorf("%s", <-c)
-	}()
+		// Capture interrupts.
+		go func() {
+			c := make(chan os.Signal)
+			signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+			errc <- fmt.Errorf("%s", <-c)
+		}()
 
-	logger.Log("exit", <-errc)
+		logger.Log("exit", <-errc)
+	}
 }
