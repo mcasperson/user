@@ -36,7 +36,10 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
 
       - name: Install dependencies
-        run: make deps && go get -v github.com/mattn/goveralls
+        run: |
+          go get -v github.com/mattn/goveralls
+          go get -v github.com/Masterminds/glide
+          glide install
 
       - name: Install/Downgrade MongoDB to version 3.6
         run: |
@@ -47,11 +50,6 @@ jobs:
 
       - name: Unit Tests
         run: ${GOPATH}/bin/glide novendor| xargs go test -v
-
-      - name: Install dependencies
-        run: |
-          go get -v github.com/Masterminds/glide
-          ${GOPATH}/bin/glide install
 
       - name: Create ZIP file
         run: |
