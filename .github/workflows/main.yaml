@@ -35,9 +35,6 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
 
-      - name: Setup PATH
-        run: echo "::add-path::${GOPATH}/bin"
-
       - name: Install dependencies
         run: make deps && go get -v github.com/mattn/goveralls
 
@@ -49,12 +46,12 @@ jobs:
           sudo apt-get install -y --allow-downgrades mongodb-org=3.6.20 mongodb-org-server=3.6.20 mongodb-org-shell=3.6.20 mongodb-org-mongos=3.6.20 mongodb-org-tools=3.6.20 || echo "Error is misleading, it was successfully installed"
 
       - name: Unit Tests
-        run: glide novendor| xargs go test -v
+        run: ${GOPATH}/bin/glide novendor| xargs go test -v
 
       - name: Install dependencies
         run: |
           go get -v github.com/Masterminds/glide
-          glide install
+          ${GOPATH}/bin/glide install
 
       - name: Create ZIP file
         run: |
