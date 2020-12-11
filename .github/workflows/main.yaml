@@ -51,38 +51,37 @@ jobs:
       - name: Unit Tests
         run: glide novendor| xargs go test -v
 
-      - name: Create cover profile
-        run: make coverprofile
+      - name: Install dependencies
+        run: |
+          go get -v github.com/Masterminds/glide
+          glide install
 
-      - name: Run Docker Test
-        run: make dockertest
+      - name: Create ZIP file
+        run: |
+          CGO_ENABLED=0 GOOS=linux go build main.go
 
-      - name: Submit Coveralls
+      - name: Create ZIP file
+        run: |
+          zip user.zip ./main
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
-          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: goveralls -coverprofile=cover.profile -service=github
-
-      # Push to dockerhub
-      - name: Push user to Docker Hub
-        uses: docker/build-push-action@v1
-        if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_PASS }}
-          dockerfile: go/src/github.com/microservices-demo/user/docker/user/Dockerfile-release
-          path: go/src/github.com/microservices-demo/user
-          repository: ${{ env.GROUP }}/${{ env.REPO }}
-          tag_with_ref: true
-          tag_with_sha: true
+          tag_name: 0.0.${{ github.run_number }}
+          release_name: Release 0.0.${{ github.run_number }}
+          draft: false
+          prerelease: false
 
-      - name: Push user-db to Docker Hub
-        uses: docker/build-push-action@v1
-        if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_PASS }}
-          dockerfile: go/src/github.com/microservices-demo/user/docker/user-db/Dockerfile
-          path: go/src/github.com/microservices-demo/user/docker/user-db
-          repository: ${{ env.GROUP }}/${{ env.REPO }}
-          tag_with_ref: true
-          tag_with_sha: true
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: go/src/github.com/microservices-demo/user/user.zip
+          asset_name: user.zip
+          asset_content_type: application/
