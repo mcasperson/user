@@ -13,7 +13,7 @@ functions:
     handler: main
     environment:
       MONGO_HOST: ${opt:hostname}
-      MONGO_USER: monngodb
+      MONGO_USER: mongodb
       MONGO_PASS: ${opt:password}
       USER_DATABASE: mongodb
       HATEAOS: user
