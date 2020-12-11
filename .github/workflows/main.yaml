@@ -39,7 +39,7 @@ jobs:
         run: |
           go get -v github.com/mattn/goveralls
           go get -v github.com/Masterminds/glide
-          glide install
+          ${GOPATH}/bin/glide install
 
       - name: Install/Downgrade MongoDB to version 3.6
         run: |
