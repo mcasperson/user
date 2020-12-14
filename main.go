@@ -156,6 +156,9 @@ func main() {
 
 	if os.Getenv("LAMBDA_TASK_ROOT") != "" {
 		adapter := httpadapter.New(handler)
+		if os.Getenv("BASE_URI") != "" {
+			adapter.StripBasePath(os.Getenv("BASE_URI"))
+		}
 		lambda.Start(func(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 			return adapter.ProxyWithContext(ctx, req)
 		})
