@@ -23,7 +23,7 @@ type Links map[string]Href
 
 func (l *Links) AddLink(ent string, id string) {
 	nl := make(Links)
-	link := fmt.Sprintf("http://%v/%v/%v", domain, entitymap[ent], id)
+	link := fmt.Sprintf("%v/%v/%v", domain, entitymap[ent], id)
 	nl[ent] = Href{link}
 	nl["self"] = Href{link}
 	*l = nl

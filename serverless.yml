@@ -16,7 +16,7 @@ functions:
       MONGO_USER: mongodb
       MONGO_PASS: ${opt:password}
       USER_DATABASE: mongodb
-      HATEAOS: user
+      HATEAOS: http://user
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
