@@ -6,7 +6,7 @@ import (
 )
 
 func TestAddLinksCard(t *testing.T) {
-	domain = "mydomain"
+	domain = "http://mydomain"
 	c := Card{ID: "test"}
 	c.AddLinks()
 	h := Href{"http://mydomain/cards/test"}
