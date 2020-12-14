@@ -31,7 +31,7 @@ func (l *Links) AddLink(ent string, id string) {
 }
 
 func (l *Links) AddAttrLink(attr string, corent string, id string) {
-	link := fmt.Sprintf("http://%v/%v/%v/%v", domain, entitymap[corent], id, entitymap[attr])
+	link := fmt.Sprintf("%v/%v/%v/%v", domain, entitymap[corent], id, entitymap[attr])
 	nl := *l
 	nl[entitymap[attr]] = Href{link}
 	*l = nl
